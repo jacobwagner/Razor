@@ -14,6 +14,7 @@ authconfig --enableshadow --passalgo=sha512 --enablefingerprint
 selinux --disabled
 timezone --utc America/Denver
 bootloader --location=mbr --driveorder=sda --append=crashkernel=auto rhgb quiet
+
 # The following is the partition information you requested
 # Note that any partitions you deleted are not expressed
 # here so unless you clear all partitions first, this is
@@ -21,6 +22,7 @@ bootloader --location=mbr --driveorder=sda --append=crashkernel=auto rhgb quiet
 zerombr
 clearpart --all --initlabel
 autopart
+
 # reboot automatically
 reboot
 
@@ -31,6 +33,8 @@ reboot
 %end
 
 %post --log=/root/razor-post.log
-cd /root
 curl <%= api_svc_uri %>/policy/callback/<%= policy_uuid %>/kickstart/end
+curl -v -o /tmp/razor_postinstall.sh <%= api_svc_uri %>/policy/callback/<%= policy_uuid %>/postinstall/inject
+echo bash /tmp/razor_postinstall.sh >> /etc/rc.local
+chmod +x /tmp/razor_postinstall.sh
 ############
