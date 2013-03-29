@@ -72,13 +72,6 @@ module ProjectRazor
       end
     end
 
-    # Validates that all instance variables for the object are not nil
-    def validate_instance_vars
-      flag = true
-      self.instance_variables.each { |iv| flag = false if (self.instance_variable_get(iv) == nil && !iv.to_s.start_with?("@_")) }
-      flag
-    end
-
     # Returns a true|false on whether the object type is valid
     # requires that the instance variables for the object have @type & @hidden
     # @param [String] namespace_prefix
@@ -122,6 +115,36 @@ module ProjectRazor
         new_hash[k.sub(/^@/,"")] = in_hash[k]
       end
       new_hash
+    end
+
+    def self.encode_symbols_in_hash(obj)
+      case obj
+      when Hash
+        encoded = Hash.new
+        obj.each_pair { |key, value| encoded[key] = encode_symbols_in_hash(value) }
+        encoded
+      when Array
+        obj.map { |item| encode_symbols_in_hash(item) }
+      when Symbol
+        ":#{obj}"
+      else
+        obj
+      end
+    end
+
+    def self.decode_symbols_in_hash(obj)
+      case obj
+      when Hash
+        decoded = Hash.new
+        obj.each_pair { |key, value| decoded[key] = decode_symbols_in_hash(value) }
+        decoded
+      when Array
+        obj.map { |item| decode_symbols_in_hash(item) }
+      when /^:/
+        obj.sub(/^:/, '').to_sym
+      else
+        obj
+      end
     end
   end
 end

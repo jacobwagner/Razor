@@ -1,5 +1,6 @@
-require "require_all"
-require "project_razor/slice_util/common"
+require 'require_all'
+require 'project_razor/object'
+require 'project_razor/slice_util/common'
 
 # @todo danielp 2012-10-24: this shouldn't include the database tooling.
 class ProjectRazor::Slice < ProjectRazor::Object
@@ -23,7 +24,7 @@ class ProjectRazor::Slice < ProjectRazor::Object
     @hidden = true
     @helper_message_objects = nil
     setup_data
-    @uri_root = @data.config.mk_uri + "/razor/api/"
+    @uri_root = ProjectRazor.config.mk_uri + "/razor/api/"
   end
 
   # Default call method for a slice
@@ -125,7 +126,7 @@ class ProjectRazor::Slice < ProjectRazor::Object
     return_hash["errcode"] = 0
     return_hash["response"] = response
     setup_data
-    return_hash["client_config"] = @data.config.get_client_config_hash if mk_response
+    return_hash["client_config"] = ProjectRazor.config.get_client_config_hash if mk_response
     if @web_command
       puts JSON.dump(return_hash)
     else
@@ -182,7 +183,7 @@ class ProjectRazor::Slice < ProjectRazor::Object
     @command = "null" if @command == nil
     return_hash["slice"] = self.class.to_s
     return_hash["command"] = @command
-    return_hash["client_config"] = @data.config.get_client_config_hash if mk_response
+    return_hash["client_config"] = ProjectRazor.config.get_client_config_hash if mk_response
     if @web_command
       puts JSON.dump(return_hash)
     else
